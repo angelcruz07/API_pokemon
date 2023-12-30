@@ -15,5 +15,3 @@
 - Eliminar Pokemon: DELETE /team/pokemons/:id
 - Intercambiar el orden de nuestro equipo pokemon: PUT /team
 - Sistema de credenciales
-
-git 
