@@ -2,12 +2,17 @@ const chai = require('chai')
 const chaiHttp = require('chai-http')
 
 chai.use(chaiHttp)
-
+const usersController = require('../controllers/users')
 const app = require('../app').app
+
+before((done) => {
+	usersController.registerUser('bettatech', '1234')
+	usersController.registerUser('mastermind', '4321')
+	done()
+})
 
 describe('Suite de pruebas teams', () => {
 	it('should return the team of the given user', (done) => {
-		// Cuando la llamada no tiene correctamente la llave
 		let team = [
 			{ name: 'Charizard' },
 			{ name: 'Blastoise' },
@@ -35,8 +40,6 @@ describe('Suite de pruebas teams', () => {
 							.get('/teams')
 							.set('Authorization', `JWT ${token}`)
 							.end((err, res) => {
-								// tiene equipo con Charizard y Blastoise
-								// { trainer: 'mastermind', team: [Pokemon]}
 								chai.assert.equal(res.statusCode, 200)
 								chai.assert.equal(res.body.trainer, 'mastermind')
 								chai.assert.equal(res.body.team.length, team.length)
@@ -82,4 +85,9 @@ describe('Suite de pruebas teams', () => {
 					})
 			})
 	})
+})
+
+after((done) => {
+	usersController.cleanUpUsers()
+	done()
 })
