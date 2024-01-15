@@ -47,4 +47,39 @@ describe('Suite de pruebas teams', () => {
 					})
 			})
 	})
+	it('should return the pokedex number', (done) => {
+		// Cuando la llamada no tiene correctamente la llave
+		let pokemonName = 'Bulbasaur'
+		chai
+			.request(app)
+			.post('/auth/login')
+			.set('content-type', 'application/json')
+			.send({ user: 'bettatech', password: '1234' })
+			.end((err, res) => {
+				let token = res.body.token
+				//Expect valid login
+				chai.assert.equal(res.statusCode, 200)
+				chai
+					.request(app)
+					.post('/teams/pokemons')
+					.send({
+						name: pokemonName
+					})
+					.set('Authorization', `JWT ${token}`)
+					.end((err, res) => {
+						chai
+							.request(app)
+							.get('/teams')
+							.set('Authorization', `JWT ${token}`)
+							.end((err, res) => {
+								chai.assert.equal(res.statusCode, 200)
+								chai.assert.equal(res.body.trainer, 'bettatech')
+								chai.assert.equal(res.body.team.length, 1)
+								chai.assert.equal(res.body.team[0].name, pokemonName)
+								chai.assert.equal(res.body.team[0].pokedexNumber, 1)
+								done()
+							})
+					})
+			})
+	})
 })
