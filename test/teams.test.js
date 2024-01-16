@@ -91,6 +91,46 @@ describe('Suite de pruebas teams', () => {
 					})
 			})
 	})
+	it('delete pokemon', (done) => {
+		let team = [
+			{ name: 'Charizard' },
+			{ name: 'Blastoise' },
+			{ name: 'Pikachu' }
+		]
+		chai
+			.request(app)
+			.post('/auth/login')
+			.set('content-type', 'application/json')
+			.send({ user: 'mastermind', password: '4321' })
+			.end((err, res) => {
+				let token = res.body.token
+				//Expect valid login
+				chai.assert.equal(res.statusCode, 200)
+				chai
+					.request(app)
+					.put('/teams')
+					.send({ team: team })
+					.set('Authorization', `JWT ${token}`)
+					.end((err, res) => {
+						chai
+							.request(app)
+							.delete('/teams/pokemons/1')
+							.set('Authorization', `JWT ${token}`)
+							.end((err, res) => {
+								chai
+									.request(app)
+									.get('/teams')
+									.set('Authorization', `JWT ${token}`)
+									.end((err, res) => {
+										chai.assert.equal(res.statusCode, 200)
+										chai.assert.equal(res.body.trainer, 'mastermind')
+										chai.assert.equal(res.body.team.length, team.length - 1)
+										done()
+									})
+							})
+					})
+			})
+	})
 })
 
 after((done) => {
