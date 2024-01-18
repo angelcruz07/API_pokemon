@@ -1,15 +1,14 @@
 const express = require('express')
-const bodyParser = require('body-parser')
-
+const middlewares = require('./middlewares')
 //Routes
 const authRoutes = require('./auth/auth.route').router
 const teamsRoutes = require('./teams/teams.router').router
 
 const app = express()
-app.use(bodyParser.json())
 
 const port = 3000
 
+middlewares.setupMiddlewares(app)
 app.get('/', (req, res) => {
 	res.status(200).send('Hello world!')
 })
