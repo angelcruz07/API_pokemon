@@ -5,11 +5,10 @@ const passport = require('passport')
 const init = () => {
 	const opts = {
 		jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'),
-		secretOrKey: 'secretPassword' //TODO deberia estar en una variable de entorno
+		secretOrKey: 'secretPassword'
 	}
 	passport.use(
 		new JwtStrategy(opts, (decoded, done) => {
-			console.log('decoded jwt', decoded)
 			return done(null, decoded)
 		})
 	)

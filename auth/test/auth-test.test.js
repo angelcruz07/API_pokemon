@@ -10,7 +10,6 @@ before((done) => {
 	usersController.registerUser('mastermind', '4321')
 	done()
 })
-
 describe('Suite de pruebas auth', () => {
 	it('should return 401 when no jwt token available', (done) => {
 		// Cuando la llamada no tiene correctamente la llave
