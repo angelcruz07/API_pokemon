@@ -7,18 +7,19 @@ const teamsController = require('../teams.controller')
 
 const app = require('../../app').app
 
-before((done) => {
-	usersController.registerUser('bettatech', '1234')
-	usersController.registerUser('mastermind', '4321')
-	done()
+beforeEach(async () => {
+	await usersController.registerUser('bettatech', '1234')
+	await usersController.registerUser('mastermind', '4321')
 })
 
 afterEach(async () => {
+	await usersController.cleanUpUsers()
 	await teamsController.cleanUpTeam()
 })
 
 describe('Suite de pruebas teams', () => {
-	it('should return the team of the given user', (done) => {
+	it('should return the team of the given user', async function () {
+		this.timeout(5000)
 		// Cuando la llamada no tiene correctamente la llave
 		let team = [
 			{ name: 'Charizard' },
@@ -60,7 +61,8 @@ describe('Suite de pruebas teams', () => {
 			})
 	})
 
-	it('should return the pokedex number', (done) => {
+	it('should return the pokedex number', async function () {
+		this.timeout(5000)
 		let team = [
 			{ name: 'Charizard' },
 			{ name: 'Blastoise' },
@@ -91,6 +93,8 @@ describe('Suite de pruebas teams', () => {
 									.get('/teams')
 									.set('Authorization', `JWT ${token}`)
 									.end((err, res) => {
+										// tiene equipo con Charizard y Blastoise
+										// { trainer: 'mastermind', team: [Pokemon]}
 										chai.assert.equal(res.statusCode, 200)
 										chai.assert.equal(res.body.trainer, 'mastermind')
 										chai.assert.equal(res.body.team.length, team.length - 1)
@@ -101,7 +105,8 @@ describe('Suite de pruebas teams', () => {
 			})
 	})
 
-	it('should remove the pokemon at index', (done) => {
+	it('should remove the pokemon at index', async function () {
+		this.timeout(5000)
 		// Cuando la llamada no tiene correctamente la llave
 		let pokemonName = 'Bulbasaur'
 		chai
@@ -137,7 +142,8 @@ describe('Suite de pruebas teams', () => {
 			})
 	})
 
-	it('should not be able to add pokemon if you already have 6', (done) => {
+	it('should not be able to add pokemon if you already have 6', async function () {
+		this.timeout(5000)
 		let team = [
 			{ name: 'Charizard' },
 			{ name: 'Blastoise' },
@@ -173,9 +179,4 @@ describe('Suite de pruebas teams', () => {
 					})
 			})
 	})
-})
-
-after((done) => {
-	usersController.cleanUpUsers()
-	done()
 })

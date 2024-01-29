@@ -1,12 +1,18 @@
 const uuid = require('uuid')
 const crypto = require('../tools/crypto.js')
 const teams = require('../teams/teams.controller')
+const { to } = require('../tools/to.js')
+const mongoose = require('mongoose')
 
-let userDatabase = {}
+const UserModel = mongoose.model('UserModel', {
+	userName: String,
+	password: String,
+	userId: String
+})
 
 const cleanUpUsers = () => {
-	return new Promise((resolve, reject) => {
-		userDatabase = {}
+	return new Promise(async (resolve, reject) => {
+		await UserModel.deleteMany({}).exec()
 		resolve()
 	})
 }
@@ -15,33 +21,42 @@ const registerUser = (userName, password) => {
 	return new Promise(async (resolve, reject) => {
 		let hashedPwd = crypto.hashPasswordSync(password)
 		let userId = uuid.v4()
-		userDatabase[userId] = {
+		let newUser = new UserModel({
+			userId: userId,
 			userName: userName,
 			password: hashedPwd
-		}
+		})
+		await newUser.save()
 		await teams.bootstrapTeam(userId)
 		resolve()
 	})
 }
 
-registerUser('bettatech', '1234')
+registerUser('prueba', '1234')
 
 const getUser = (userId) => {
-	return new Promise((resolve, reject) => {
-		resolve(userDatabase[userId])
+	return new Promise(async (resolve, reject) => {
+		let [err, result] = await to(UserModel.findOne({ userId: userId })).exect()
+		if (err) {
+			return reject(err)
+		}
+		resolve(result)
 	})
 }
 
 const getUserIdFromUserName = (userName) => {
 	return new Promise((resolve, reject) => {
-		for (let user in userDatabase) {
-			if (userDatabase[user].userName == userName) {
-				let userData = userDatabase[user]
-				userData.userId = user
-				return resolve(userData)
+		return new Promise(async (resolve, reject) => {
+			let [err, result] = await to(
+				UserModel.findOne({
+					userName: userName
+				})
+			).exect()
+			if (err) {
+				return reject(err)
 			}
-		}
-		reject('No user found')
+			resolve(result)
+		})
 	})
 }
 
@@ -61,6 +76,7 @@ const checkUserCredentials = (userName, password) => {
 		}
 	})
 }
+
 exports.registerUser = registerUser
 exports.checkUserCredentials = checkUserCredentials
 exports.getUserIdFromUserName = getUserIdFromUserName

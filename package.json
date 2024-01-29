@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "node node_modules/mocha/bin/mocha teams/**/*.test.js auth/**/*.test.js tools/**/*.test.js"
+		"test": "set NODE_ENV=test&& mocha teams/**/*.test.js auth/**/*.test.js tools/**/*.test.js"
 	},
 	"author": "",
 	"license": "ISC",
